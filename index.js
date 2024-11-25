@@ -37,6 +37,9 @@ app.get('/', (req, res) => {
     //res.send("Hello from server");
 });
 
+
+console.log("Hi there. It is testing");
+
 /**
 app.post('/', async (req, res) => {
     try {
