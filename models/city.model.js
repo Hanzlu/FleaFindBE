@@ -8,4 +8,4 @@ const CitySchema = mongoose.Schema({
 });
 
 const City = mongoose.model('City', CitySchema);
-export default City;
+module.exports = City;

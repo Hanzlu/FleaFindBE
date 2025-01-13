@@ -1,5 +1,3 @@
-import { WriteConcernError } from 'mongodb';
-
 const mongoose = require('mongoose');
 
 const OwnerSchema = mongoose.Schema({
@@ -13,4 +11,4 @@ const OwnerSchema = mongoose.Schema({
 });
 
 const Owner = mongoose.model('Owner', OwnerSchema);
-export default Owner;
+module.exports = Owner;
