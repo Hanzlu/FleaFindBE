@@ -41,11 +41,11 @@ mongoose.connect(MongoDB_URL) //environmental variable containing login credenti
 });
 
 
-//Routes
-app.use('api/city', cityRoute);
-app.use('api/market', marketRoute);
-app.use('api/owner', ownerRoute);
-app.use('api/review', reviewRoute);
+//Routes (link must begin with /)
+app.use('/api/city', cityRoute);
+app.use('/api/market', marketRoute);
+app.use('/api/owner', ownerRoute);
+app.use('/api/review', reviewRoute);
 
 
 //Home route

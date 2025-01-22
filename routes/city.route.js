@@ -1,3 +1,6 @@
+//city is only for testing
+//! ! ! ! ! ! ! ! ! ! ! ! !
+
 const express = require('express');
 const City = require("../models/city.model.js");
 const router = express.Router();
@@ -5,7 +8,6 @@ const router = express.Router();
 router.get('/', async (req,res) => {
     try {
         const cities = await City.find(); //use find({}) for getting all
-        console.log(cities);
         res.status(200).json(cities);
     } catch (error) {
         res.status(500).json({message: error.message});

@@ -2,7 +2,7 @@ const express = require('express');
 const Review = require("../models/review.model.js");
 const router = express.Router();
 
-router.get('/', async (req,res) => {
+router.get('/:id', async (req,res) => {
     try {
         const { id } = req.params; //get the id from request
         const review = await Review.findById(id); //use find({}) for getting all
@@ -12,6 +12,16 @@ router.get('/', async (req,res) => {
     }
 });
 
+//get all the reviews for a particular market
+router.get('/getByMarket/:marketID', async (req, res) => {
+    try {
+        const { marketID } = req.params; //get the market
+        const reviews = await Review.find( {market: marketID} );
+        res.status(200).json(reviews);
+    } catch (error) {
+        res.status(500).json({message: error.message});  
+    }
+});
 
 router.post('/', async (req,res) => {
     try {

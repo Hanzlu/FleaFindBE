@@ -2,7 +2,7 @@ const express = require('express');
 const Owner = require("../models/owner.model.js");
 const router = express.Router();
 
-router.get('/', async (req,res) => {
+router.get('/:id', async (req,res) => {
     try {
         const { id } = req.params; //get the id from request
         const owner = await Owner.findById(id); //use find({}) for getting all

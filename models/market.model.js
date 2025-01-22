@@ -7,7 +7,9 @@ const MarketSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Owner'
     },
+    popup: {type: Boolean, required: true, default: false}, //is it a popup or not
     opening_hours: String, //handled by frontend
+    city: {type: String, required: true, maxLength: 64},
     address: {type: String, required: true, maxLength: 250},
     location: String, //handled by frontend
     instagram_link: {type: String, maxLength: 250},
