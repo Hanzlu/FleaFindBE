@@ -20,6 +20,7 @@ const MarketSchema = mongoose.Schema({
     //array of categories (string) //categories
     //image list -- different object?
     //..also image for logo separately
+    //rating? either updated (prob. better) or calculated
 //Date.now is the date when object is created(?)
     created_at: {type: Date, default: Date.now}
 });

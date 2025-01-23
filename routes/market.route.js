@@ -1,5 +1,6 @@
 const express = require('express');
 const Market = require("../models/market.model.js");
+const Review = require('../models/review.model.js');
 const router = express.Router();
 
 router.get('/:id', async (req,res) => {
@@ -11,6 +12,45 @@ router.get('/:id', async (req,res) => {
         res.status(500).json({message: error.message});
     }
 });
+
+//get all markets in a city (String)
+//returns empty string if none
+router.get('/getByCity/:city', async (req, res) => {
+    try {
+        const { city } = req.params;
+        const markets = await Market.find( {city: city} );
+        res.status(200).json(markets);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
+
+//get all markets owned by an owner (id)
+//returns empty string if none
+router.get('/getByOwner/:ownerID', async (req, res) => {
+    try {
+        const { ownerID } = req.params;
+        const markets = await Market.find( {owner: ownerID} );
+        res.status(200).json(markets);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
+
+//get all popup markets in a city
+router.get('/getPopupsByCity/:city', async (req, res) => {
+    try {
+        const { city } = req.params;
+        const markets = await Market.find( {popup: true, city: city} ); //requires two criteria
+        res.status(200).json(markets);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
+
+// TODO
+//get all markets above a certain rating
+//:this requires calculating or storing the rating
 
 router.post('/', async (req,res) => {
     try {
