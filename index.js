@@ -2,6 +2,9 @@
 //You cannot connect to MongoDB unless your IP address has been added in MongoDB Atlas.
 //Ask "me" for the email and password. I might be able to give access to all IP addresses too.
 
+//cloudinary and multer are only imported in market.route.js
+//bcrypt is only imported in owner.route.js
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -54,3 +57,7 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname+"/pages/index.html");
     //res.send("Hello from server");
 });
+
+//TODO
+//charity route
+//about route

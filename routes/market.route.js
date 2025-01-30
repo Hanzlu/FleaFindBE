@@ -1,7 +1,18 @@
 const express = require('express');
+const cloudinary = require('cloudinary').v2;
 const Market = require("../models/market.model.js");
 const Review = require('../models/review.model.js');
 const router = express.Router();
+
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
+//cloudinary configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+});
 
 router.get('/:id', async (req,res) => {
     try {
@@ -56,6 +67,30 @@ router.post('/', async (req,res) => {
     try {
         const market = await Market.create(req.body);
         res.status(200).json(market);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
+
+//upload logo image:
+//receives the image as a file
+//uploads it to cloudinary and gets a link to it
+//stores the link in the market DB model
+router.post('/uploads/:market_id', upload.single('file'), async (req, res) => {
+    try {
+        console.log("it is here");
+        //upload the logo to cloudinary and get its cloudinary link
+        //TODO, make this into a separate function
+        const file = req.file; //market logo
+        const results = await cloudinary.uploader.upload(file.path);
+        const url = cloudinary.url(results.public_id); //as a second argument, the transform:
+        //add the link to the JSON and store the object
+        const { market_id } = req.params; //get the id from request
+        const market = await Market.findById(market_id); //use find({}) for getting all
+        market.logo_link = url;
+        //update the market object in DB
+        const updated_market = await Market.findByIdAndUpdate(market_id, market);
+        res.status(200).json(updated_market);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

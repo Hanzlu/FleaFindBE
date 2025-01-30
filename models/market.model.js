@@ -5,7 +5,8 @@ const MarketSchema = mongoose.Schema({
     name: {type: String, required: true, maxLength: 64},
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Owner'
+        ref: 'Owner',
+        required: true
     },
     popup: {type: Boolean, required: true, default: false}, //is it a popup or not
     opening_hours: String, //handled by frontend
@@ -20,6 +21,7 @@ const MarketSchema = mongoose.Schema({
     //array of categories (string) //categories
     //image list -- different object?
     //..also image for logo separately
+    logo_link: String,
     //rating? either updated (prob. better) or calculated
 //Date.now is the date when object is created(?)
     created_at: {type: Date, default: Date.now}
