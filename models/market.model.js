@@ -23,6 +23,8 @@ const MarketSchema = mongoose.Schema({
     //..also image for logo separately
     logo_link: String,
     //rating? either updated (prob. better) or calculated
+    score_sum: {type: Number, default: 0}, 
+    num_of_reviews: {type: Number, default: 0},
 //Date.now is the date when object is created(?)
     created_at: {type: Date, default: Date.now}
 });
