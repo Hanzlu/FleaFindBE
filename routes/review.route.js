@@ -27,12 +27,13 @@ router.get('/getByMarket/:marketID', async (req, res) => {
 router.post('/', async (req,res) => {
     try {
         // get the market id from the json
-        const { marketID } = req.body.market;
+        const marketID = req.body.market;
         // get the market with that id
         const market = await Market.findById(marketID);
         // update the market object
         market.score_sum = market.score_sum + req.body.score;
         market.num_of_reviews = market.num_of_reviews + 1;
+        const updated_market = await Market.findByIdAndUpdate(marketID, market);
         // save the review object
         const review = await Review.create(req.body);
         res.status(200).json(review);
@@ -55,15 +56,17 @@ router.put('/:id', async (req,res) => {
 router.delete('/:id', async (req,res) => {
     try {
         const { id } = req.params;
-        const review = await Review.findByIdAndDelete(id);
-         // get the market id from the json
-         const { marketID } = review.market;
-         // get the market with that id
-         const market = await Market.findById(marketID);
-         // update the market object
-         market.score_sum = market.score_sum - review.score;
-         market.num_of_reviews = market.num_of_reviews - 1;
-         // save the review object
+        const review = await Review.findById(id);
+        const deleted_market_review = await Review.findByIdAndDelete(id);
+        // get the market id from the json
+        const marketID = review.market;
+        // get the market with that id
+        const market = await Market.findById(marketID);
+        // update the market object
+        market.score_sum = market.score_sum - review.score;
+        market.num_of_reviews = market.num_of_reviews - 1;
+        const updated_market = await Market.findByIdAndUpdate(marketID, market);
+        // save the review object
         if (!review) { return res.status(404).json({message: "Review not found"}); }
         res.status(200).json({message: "Review deleted succesfully"});
     } catch (error) {
