@@ -5,20 +5,19 @@
 //cloudinary and multer are only imported in market.route.js
 //bcrypt is only imported in owner.route.js
 
-const express = require('express');
-const path = require('path');
-const mongoose = require('mongoose');
+const express = require("express");
+const path = require("path");
+const mongoose = require("mongoose");
 
 //import models
-const City = require('./models/city.model.js'); //city will not be used as a DB model
-const Owner = require('./models/owner.model.js');
-const Market = require('./models/market.model.js');
-const Review = require('./models/review.model.js');
-const cityRoute = require('./routes/city.route.js');
-const marketRoute = require('./routes/market.route.js');
-const ownerRoute = require('./routes/owner.route.js');
-const reviewRoute = require('./routes/review.route.js');
-
+const City = require("./models/city.model.js"); //city will not be used as a DB model
+const Owner = require("./models/owner.model.js");
+const Market = require("./models/market.model.js");
+const Review = require("./models/review.model.js");
+const cityRoute = require("./routes/city.route.js");
+const marketRoute = require("./routes/market.route.js");
+const ownerRoute = require("./routes/owner.route.js");
+const reviewRoute = require("./routes/review.route.js");
 
 //environmental variables
 const MongoDB_URL = process.env.MongoDB_URL;
@@ -29,33 +28,32 @@ const app = express();
 app.use(express.json()); //allow json
 //1:09:00 [1] for HTML forms (?)
 
-
 //connect to mongoDB and start the server
-mongoose.connect(MongoDB_URL) //environmental variable containing login credentials
-.then(() => {
+mongoose
+  .connect(MongoDB_URL) //environmental variable containing login credentials
+  .then(() => {
     console.log("Connected to the database...");
     //start the server
     app.listen(8000, () => {
-        console.log("Server is running on port 8000");
+      console.log("Server is running on port 8000");
     });
-})
-.catch(() => {
+  })
+  .catch(() => {
     console.log("Failed to connect to database.");
-});
-
+  });
 
 //Routes (link must begin with /)
-app.use('/api/city', cityRoute);
-app.use('/api/market', marketRoute);
-app.use('/api/owner', ownerRoute);
-app.use('/api/review', reviewRoute);
-
+app.use("/api/city", cityRoute);
+app.use("/api/market", marketRoute);
+app.use("/api/owner", ownerRoute);
+app.use("/api/review", reviewRoute);
 
 //Home route
-app.get('/', (req, res) => {
-    console.log("GET /");
-    res.sendFile(__dirname+"/pages/index.html");
-    //res.send("Hello from server");
+app.get("/", (req, res) => {
+  console.log("GET /");
+  console.log("checking for contributor access");
+  res.sendFile(__dirname + "/pages/index.html");
+  //res.send("Hello from server");
 });
 
 //TODO
