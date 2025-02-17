@@ -4,10 +4,11 @@
 
 //cloudinary and multer are only imported in market.route.js
 //bcrypt is only imported in owner.route.js
-
+require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 //import models
 const City = require("./models/city.model.js"); //city will not be used as a DB model
@@ -25,6 +26,7 @@ const MongoDB_URL = process.env.MongoDB_URL;
 const app = express();
 
 //middleware
+app.use(cors());
 app.use(express.json()); //allow json
 //1:09:00 [1] for HTML forms (?)
 
