@@ -10,11 +10,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-//import models
-const City = require("./models/city.model.js"); //city will not be used as a DB model
-const Owner = require("./models/owner.model.js");
-const Market = require("./models/market.model.js");
-const Review = require("./models/review.model.js");
+//import Routes
 const cityRoute = require("./routes/city.route.js");
 const marketRoute = require("./routes/market.route.js");
 const ownerRoute = require("./routes/owner.route.js");

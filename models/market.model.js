@@ -9,6 +9,7 @@ const MarketsSchema = new mongoose.Schema(
     },
     name: { type: String, required: true },
     description: { type: String },
+    city: { type: String, required: true },
     location: {
       address: { type: String, required: true },
       coordinates: { type: [Number], index: "2dsphere" }, // [longitude, latitude]
