@@ -19,9 +19,8 @@ const MarketSchema = mongoose.Schema({
     website_link: {type: String, maxLength: 250},
     phone: {type: String, maxLength: 64},
     //array of categories (string) //categories
-    //image list -- different object?
-    //..also image for logo separately
-    logo_link: String,
+    //image list -- first object is logo
+    image_list: {type: Array, default: [null, null, null, null, null, null, null, null, null, null, null]},
     //rating? either updated (prob. better) or calculated
     score_sum: {type: Number, default: 0}, 
     num_of_reviews: {type: Number, default: 0},

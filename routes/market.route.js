@@ -76,21 +76,27 @@ router.post('/', async (req,res) => {
 //receives the image as a file
 //uploads it to cloudinary and gets a link to it
 //stores the link in the market DB model
-router.post('/uploads/:market_id', upload.single('file'), async (req, res) => {
+router.post('/uploads/:market_id', upload.any('files'), async (req, res) => {
     try {
-        console.log("it is here");
+        const marketID = req.params.market_id; //get the id from request
+        const market = await Market.findById(marketID); //use find({}) for getting all
         //upload the logo to cloudinary and get its cloudinary link
         //TODO, make this into a separate function
-        const file = req.file; //market logo
-        const results = await cloudinary.uploader.upload(file.path);
-        const url = cloudinary.url(results.public_id); //as a second argument, the transform:
-        //add the link to the JSON and store the object
-        const { market_id } = req.params; //get the id from request
-        const market = await Market.findById(market_id); //use find({}) for getting all
-        market.logo_link = url;
-        //update the market object in DB
-        const updated_market = await Market.findByIdAndUpdate(market_id, market);
-        res.status(200).json(updated_market);
+        const files = req.files; //uploaded images
+        for (var i=0; i<files.length; i++) {
+            //delete the old image
+            if (market.image_list[i] != null) {
+                cloudinary.uploader.destroy(market.image_list[i]);
+            }
+            //upload the new image
+            results = await cloudinary.uploader.upload(files[i].path);
+            url = cloudinary.url(results.public_id);
+            //store the link in DB
+            market.image_list[i] = url;
+        }
+            //update the market object in DB
+    //const updated_market = await Market.findByIdAndUpdate(market_id, market);
+        res.status(200).json({});
     } catch (error) {
         res.status(500).json({message: error.message});
     }
