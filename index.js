@@ -1,14 +1,10 @@
-//NOTE!
-//You cannot connect to MongoDB unless your IP address has been added in MongoDB Atlas.
-//Ask "me" for the email and password. I might be able to give access to all IP addresses too.
-
 //cloudinary and multer are only imported in market.route.js
 //bcrypt is only imported in owner.route.js
-require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require("dotenv").config();
 
 //import Routes
 const cityRoute = require("./routes/city.route.js");
@@ -23,7 +19,8 @@ const app = express();
 
 //middleware
 app.use(cors());
-app.use(express.json()); //allow json
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Allow form data
 //1:09:00 [1] for HTML forms (?)
 
 //connect to mongoDB and start the server

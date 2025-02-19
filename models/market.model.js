@@ -15,18 +15,10 @@ const MarketsSchema = new mongoose.Schema(
       coordinates: { type: [Number], index: "2dsphere" }, // [longitude, latitude]
     },
     categories: [{ type: String }],
-    openingHours: {
-      monday: String,
-      tuesday: String,
-      wednesday: String,
-      thursday: String,
-      friday: String,
-      saturday: String,
-      sunday: String,
-    },
+    openingHours: { type: String, required: false },
     priceList: { type: String },
     socialMedia: {
-      website: String,
+      twitter: String,
       facebook: String,
       instagram: String,
     },

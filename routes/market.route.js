@@ -3,11 +3,13 @@ const router = express.Router();
 const { check } = require("express-validator");
 const marketController = require("../controllers/marketController");
 const authMiddleware = require("../middleware/authMiddleware"); // Assuming you have an auth middleware to verify JWT and user permissions
+const uploadFields = require("../middleware/uploadMiddleware"); // Import new upload middleware
 
 // Create a Market (Owner only)
 router.post(
-  "/create",
+  "/",
   authMiddleware,
+  uploadFields,
   [
     check("name", "Market name is required").not().isEmpty(),
     check("city", "City is required").not().isEmpty(),
@@ -19,7 +21,12 @@ router.post(
 );
 
 // Update a Market (Owner only)
-router.put("/update/:marketId", authMiddleware, marketController.updateMarket);
+router.put(
+  "/update/:marketId",
+  authMiddleware,
+  uploadFields,
+  marketController.updateMarket
+);
 
 // Delete a Market (Owner only)
 router.delete(
@@ -29,9 +36,9 @@ router.delete(
 );
 
 // Get all Markets (Everyone can access)
-router.get("/all", marketController.getAllMarkets);
+router.get("/", marketController.getAllMarkets);
 
 // Get Owner's Markets (Owner only)
-router.get("/my-markets", authMiddleware, marketController.getOwnerMarkets);
+router.get("/owner", authMiddleware, marketController.getOwnerMarkets);
 
 module.exports = router;
