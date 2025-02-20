@@ -14,6 +14,28 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_SECRET
 });
 
+//6790a75f2a9098b672b168b5
+
+//this is how multiple filters can be applied
+router.get('/getByFilters', async (req, res) => {
+    try {
+        var filters = {};
+        if (req.body.hasOwnProperty("city")) {
+            filters.city = req.body.city;
+        }
+        if (req.body.hasOwnProperty("name")) {
+            filters.name = req.body.name;
+        }
+        console.log(filters);
+ 
+        const markets = await Market.find(filters);
+        console.log(markets);
+        res.status(200).json(markets);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
+
 router.get('/:id', async (req,res) => {
     try {
         const { id } = req.params; //get the id from request
@@ -58,6 +80,8 @@ router.get('/getPopupsByCity/:city', async (req, res) => {
         res.status(500).json({message: error.message});
     }
 });
+
+
 
 // TODO
 //get all markets above a certain rating
