@@ -1,17 +1,18 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const ReviewSchema = mongoose.Schema({
-    id: mongoose.ObjectId,
-    author: {type: String, required: true, maxLength: 64},
-    review: {type: String, required: true, maxLength: 4096},
-    score: {type: Number, required: true},
-    market: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Market'
+const ReviewSchema = new mongoose.Schema(
+  {
+    marketId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Markets",
+      required: true,
     },
-    //Date.now is the date when object is created(?)
-    created_at: {type: Date, default: Date.now}
-});
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    comment: { type: String, required: true },
+  },
+  { timestamps: true }
+);
 
-const Review = mongoose.model('Review', ReviewSchema);
-module.exports = Review;
+module.exports = mongoose.model("Reviews", ReviewSchema);

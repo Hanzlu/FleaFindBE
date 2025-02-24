@@ -24,6 +24,8 @@ const MarketsSchema = new mongoose.Schema(
     },
     images: [{ type: String }], // Array of Cloudinary URLs
     logo: { type: String },
+    reviewCount: { type: Number, default: 0 },
+    averageRating: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
