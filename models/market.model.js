@@ -8,6 +8,7 @@ const MarketsSchema = new mongoose.Schema(
       required: true,
     },
     name: { type: String, required: true },
+    marketType: { type: String, required: true },
     description: { type: String },
     city: { type: String, required: true },
     location: {

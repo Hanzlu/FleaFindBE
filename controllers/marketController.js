@@ -8,6 +8,7 @@ exports.createMarket = async (req, res) => {
   try {
     const {
       name,
+      marketType,
       description,
       city,
       location,
@@ -30,6 +31,7 @@ exports.createMarket = async (req, res) => {
     const newMarket = new Markets({
       owner: req.owner._id, // Get owner from middleware
       name,
+      marketType,
       description,
       city,
       location: {
@@ -60,9 +62,14 @@ exports.updateMarket = async (req, res) => {
     const { marketId } = req.params;
     const {
       name,
+      marketType,
       description,
       city,
+      logo,
+      images,
       location,
+      longitude,
+      latitude,
       categories,
       openingHours,
       priceList,
@@ -70,11 +77,15 @@ exports.updateMarket = async (req, res) => {
     } = req.body;
 
     const market = await Markets.findById(marketId);
+
     if (!market) return res.status(404).json({ error: "Market not found" });
-    if (market.owner.toString() !== req.user.id)
+
+    // Ensure the owner is authorized to update the market
+    if (market.owner.toString() !== req.owner.id) {
       return res
         .status(403)
         .json({ error: "Unauthorized to update this market" });
+    }
 
     // Handle logo update
     const logoFile = req.files["logo"] ? req.files["logo"][0] : null;
@@ -99,15 +110,29 @@ exports.updateMarket = async (req, res) => {
 
     // Update fields
     market.name = name || market.name;
+    market.marketType = marketType || market.marketType;
     market.description = description || market.description;
     market.city = city || market.city;
-    market.location = location || market.location;
+
+    // Update location correctly
+    if (location || longitude || latitude) {
+      market.location = {
+        address: location || market.location.address,
+        coordinates: [
+          longitude || market.location.coordinates[0], // Default to previous coordinates if not provided
+          latitude || market.location.coordinates[1], // Default to previous coordinates if not provided
+        ],
+      };
+    }
+
     market.categories = categories ? JSON.parse(categories) : market.categories;
     market.openingHours = openingHours || market.openingHours;
     market.priceList = priceList || market.priceList;
     market.socialMedia = socialMedia
       ? JSON.parse(socialMedia)
       : market.socialMedia;
+    market.logo = logo || market.logo;
+    market.images = images || market.images;
 
     await market.save();
     res.json({ message: "Market updated successfully", market });
@@ -128,7 +153,7 @@ exports.deleteMarket = async (req, res) => {
       return res.status(404).json({ error: "Market not found" });
     }
 
-    if (market.owner.toString() !== req.user.id) {
+    if (market.owner.toString() !== req.owner.id) {
       return res
         .status(403)
         .json({ error: "You are not authorized to delete this market" });
