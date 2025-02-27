@@ -29,11 +29,7 @@ router.put(
 );
 
 // Delete a Market (Owner only)
-router.delete(
-  "/delete/:marketId",
-  authMiddleware,
-  marketController.deleteMarket
-);
+router.delete("/:marketId", authMiddleware, marketController.deleteMarket);
 
 // Get all Markets (Everyone can access)
 router.get("/", marketController.getAllMarkets);

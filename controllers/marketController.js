@@ -12,14 +12,17 @@ exports.createMarket = async (req, res) => {
       description,
       city,
       location,
-      longitude,
       latitude,
+      longitude,
       categories,
       openingHours,
       priceList,
       socialMedia,
       logo,
       images,
+      marketNumber,
+      marketEmail,
+      marketWebsite,
     } = req.body;
 
     // Ensure owner is attached from middleware
@@ -27,23 +30,43 @@ exports.createMarket = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Create a new market entry with image URLs
+    // Handle the logo and images as already parsed JSON objects
+    const parsedLogo = logo ? JSON.parse(logo) : null;
+    const parsedImages = images ? images.map((image) => JSON.parse(image)) : [];
+
+    // Create a new market entry with image URLs and data validation
     const newMarket = new Markets({
       owner: req.owner._id, // Get owner from middleware
       name,
       marketType,
       description,
+      marketNumber,
+      marketEmail,
+      marketWebsite,
       city,
       location: {
         address: location,
         coordinates: [longitude, latitude], // Store coordinates as [longitude, latitude]
       },
-      categories: JSON.parse(categories),
+      categories: Array.isArray(categories)
+        ? categories
+        : JSON.parse(categories || "[]"),
       openingHours,
       priceList,
-      socialMedia: JSON.parse(socialMedia),
-      logo, // Directly storing the Cloudinary URL
-      images, // Directly storing the array of Cloudinary URLs
+      socialMedia: socialMedia ? JSON.parse(socialMedia) : {}, // Avoid parsing if it's null or undefined
+      logo: parsedLogo
+        ? {
+            url: parsedLogo.url,
+            publicId: parsedLogo.publicId,
+          }
+        : null,
+      images:
+        parsedImages.length > 0
+          ? parsedImages.map((img) => ({
+              url: img.url,
+              publicId: img.publicId,
+            }))
+          : [],
     });
 
     await newMarket.save();
@@ -74,53 +97,54 @@ exports.updateMarket = async (req, res) => {
       openingHours,
       priceList,
       socialMedia,
+      marketNumber,
+      marketEmail,
+      marketWebsite,
     } = req.body;
 
     const market = await Markets.findById(marketId);
-
     if (!market) return res.status(404).json({ error: "Market not found" });
 
     // Ensure the owner is authorized to update the market
-    if (market.owner.toString() !== req.owner.id) {
+    if (!req.owner || market.owner.toString() !== req.owner._id.toString()) {
       return res
         .status(403)
         .json({ error: "Unauthorized to update this market" });
     }
 
+    // Parse logo and images correctly
+    const parsedLogo = logo ? JSON.parse(logo) : null;
+    const parsedImages = images ? images.map((image) => JSON.parse(image)) : [];
+
     // Handle logo update
-    const logoFile = req.files["logo"] ? req.files["logo"][0] : null;
-    if (logoFile) {
-      if (market.logo) {
-        await cloudinary.uploader.destroy(market.logo); // Remove old image
-      }
-      market.logo = logoFile.path;
-    }
+    market.logo = {
+      url: parsedLogo.url,
+      publicId: parsedLogo.publicId,
+    };
 
     // Handle images update
-    const imageFiles = req.files["images"] || [];
-    if (imageFiles.length > 0) {
-      // Delete old images
-      if (market.images.length > 0) {
-        await Promise.all(
-          market.images.map((img) => cloudinary.uploader.destroy(img))
-        );
-      }
-      market.images = imageFiles.map((file) => file.path);
-    }
+
+    market.images = parsedImages.map((img) => ({
+      url: img.url,
+      publicId: img.publicId,
+    }));
 
     // Update fields
     market.name = name || market.name;
     market.marketType = marketType || market.marketType;
     market.description = description || market.description;
     market.city = city || market.city;
+    market.marketNumber = marketNumber || market.marketNumber;
+    market.marketEmail = marketEmail || market.marketEmail;
+    market.marketWebsite = marketWebsite || market.marketWebsite;
 
     // Update location correctly
     if (location || longitude || latitude) {
       market.location = {
         address: location || market.location.address,
         coordinates: [
-          longitude || market.location.coordinates[0], // Default to previous coordinates if not provided
-          latitude || market.location.coordinates[1], // Default to previous coordinates if not provided
+          longitude !== undefined ? longitude : market.location.coordinates[0],
+          latitude !== undefined ? latitude : market.location.coordinates[1],
         ],
       };
     }
@@ -131,13 +155,11 @@ exports.updateMarket = async (req, res) => {
     market.socialMedia = socialMedia
       ? JSON.parse(socialMedia)
       : market.socialMedia;
-    market.logo = logo || market.logo;
-    market.images = images || market.images;
 
     await market.save();
     res.json({ message: "Market updated successfully", market });
   } catch (error) {
-    console.error(error.message);
+    console.error("Server Error:", error.message);
     res.status(500).json({ error: "Server Error" });
   }
 };
@@ -153,13 +175,13 @@ exports.deleteMarket = async (req, res) => {
       return res.status(404).json({ error: "Market not found" });
     }
 
-    if (market.owner.toString() !== req.owner.id) {
+    if (market.owner.toString() !== req.owner._id.toString()) {
       return res
         .status(403)
         .json({ error: "You are not authorized to delete this market" });
     }
 
-    await market.remove();
+    await market.deleteOne();
     res.json({ message: "Market deleted successfully" });
   } catch (error) {
     console.error(error.message);

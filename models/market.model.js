@@ -23,10 +23,21 @@ const MarketsSchema = new mongoose.Schema(
       facebook: String,
       instagram: String,
     },
-    images: [{ type: String }], // Array of Cloudinary URLs
-    logo: { type: String },
+    images: [
+      {
+        url: { type: String, required: true }, // Cloudinary URL
+        publicId: { type: String, required: true }, // Cloudinary publicId
+      },
+    ], // Array of objects with url and publicId
+    logo: {
+      url: { type: String, required: true }, // Cloudinary URL
+      publicId: { type: String, required: true }, // Cloudinary publicId
+    },
     reviewCount: { type: Number, default: 0 },
     averageRating: { type: Number, default: 0 },
+    marketNumber: { type: String, required: false },
+    marketEmail: { type: String, required: false },
+    marketWebsite: { type: String, required: false },
   },
   { timestamps: true }
 );
