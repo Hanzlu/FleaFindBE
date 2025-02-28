@@ -11,6 +11,7 @@ const cityRoute = require("./routes/city.route.js");
 const marketRoute = require("./routes/market.route.js");
 const ownerRoute = require("./routes/owner.route.js");
 const reviewRoutes = require("./routes/review.route.js");
+const eventRoutes = require("./routes/event.route.js");
 
 //environmental variables
 const MongoDB_URL = process.env.MongoDB_URL;
@@ -42,3 +43,4 @@ app.use("/api/city", cityRoute);
 app.use("/api/market", marketRoute);
 app.use("/api/owner", ownerRoute);
 app.use("/api/review", reviewRoutes);
+app.use("/api/event", eventRoutes);

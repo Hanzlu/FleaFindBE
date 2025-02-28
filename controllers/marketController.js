@@ -1,7 +1,4 @@
-const mongoose = require("mongoose");
 const Markets = require("../models/market.model"); // Assuming you have the model in the 'models' directory
-const cloudinary = require("../config/cloudinary");
-const { validationResult } = require("express-validator");
 
 // Create Market (Owner Only)
 exports.createMarket = async (req, res) => {
