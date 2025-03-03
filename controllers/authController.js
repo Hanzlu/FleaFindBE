@@ -2,32 +2,27 @@ const Owner = require("../models/owner.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Owner Registration
 exports.registerOwner = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if email exists
+    console.log("Incoming request body:", req.body); // Debugging line
+
     const existingOwner = await Owner.findOne({ email });
     if (existingOwner)
       return res.status(400).json({ message: "Email already exists" });
 
-    // Hash the password before saving it
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
-
-    const owner = new Owner({
-      name,
-      email,
-      password: hashedPassword, // Store the hashed password
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const owner = new Owner({ name, email, password: hashedPassword });
 
     await owner.save();
-
     res.status(201).json({ message: "Owner registered successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error registering owner:", err); // Log error for debugging
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 // Owner Login
 exports.loginOwner = async (req, res) => {
   try {
