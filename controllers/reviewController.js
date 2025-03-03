@@ -39,6 +39,37 @@ exports.createReview = async (req, res) => {
   }
 };
 
+exports.replyToReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { replyText } = req.body;
+    const ownerId = req.owner._id; // Extract ownerId from authenticated user
+
+    if (!replyText) {
+      return res.status(400).json({ error: "Reply text is required" });
+    }
+
+    // Find the review
+    const review = await Reviews.findById(reviewId);
+    if (!review) return res.status(404).json({ error: "Review not found" });
+
+    // Check if the authenticated user is the owner of the market
+    const market = await Market.findById(review.marketId);
+    if (!market || market.owner.toString() !== ownerId.toString()) {
+      return res.status(403).json({ error: "Unauthorized to reply" });
+    }
+
+    // Add the reply
+    review.replies.push({ ownerId, replyText });
+    await review.save();
+
+    res.status(201).json({ message: "Reply added successfully", review });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
 // Get All Reviews for a Market
 exports.getMarketReviews = async (req, res) => {
   try {
