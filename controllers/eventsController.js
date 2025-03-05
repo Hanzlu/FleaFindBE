@@ -43,10 +43,10 @@ exports.createEvent = async (req, res) => {
       time: eventTime,
       location: eventLocation,
       eventType: eventCategory,
-      eventImage: {
-        url: parsedImage.url,
-        publicId: parsedImage.publicId,
-      },
+      eventImage: parsedImage
+        ? { url: parsedImage.url, publicId: parsedImage.publicId }
+        : null,
+
       markets: selectedMarkets.map((m) => m._id),
     });
 
@@ -114,6 +114,7 @@ exports.updateEvent = async (req, res) => {
     event.eventImage = parsedImage
       ? { url: parsedImage.url, publicId: parsedImage.publicId }
       : event.eventImage;
+
     event.markets = selectedMarkets.map((m) => m._id);
 
     // Save the updated event
