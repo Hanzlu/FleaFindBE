@@ -22,18 +22,21 @@ exports.createMarket = async (req, res) => {
       marketWebsite,
     } = req.body;
 
-    // Ensure owner is attached from middleware
     if (!req.owner) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Handle the logo and images as already parsed JSON objects
     const parsedLogo = logo ? JSON.parse(logo) : null;
-    const parsedImages = images ? images.map((image) => JSON.parse(image)) : [];
+    let parsedImages = [];
 
-    // Create a new market entry with image URLs and data validation
+    if (images) {
+      parsedImages = Array.isArray(images)
+        ? images.map((image) => JSON.parse(image))
+        : [JSON.parse(images)]; // Convert single image to array
+    }
+
     const newMarket = new Markets({
-      owner: req.owner._id, // Get owner from middleware
+      owner: req.owner._id,
       name,
       marketType,
       description,
@@ -43,27 +46,24 @@ exports.createMarket = async (req, res) => {
       city,
       location: {
         address: location,
-        coordinates: [longitude, latitude], // Store coordinates as [longitude, latitude]
+        coordinates: [longitude, latitude],
       },
       categories: Array.isArray(categories)
         ? categories
         : JSON.parse(categories || "[]"),
       openingHours,
       priceList,
-      socialMedia: socialMedia ? JSON.parse(socialMedia) : {}, // Avoid parsing if it's null or undefined
+      socialMedia: socialMedia ? JSON.parse(socialMedia) : {},
       logo: parsedLogo
         ? {
             url: parsedLogo.url,
             publicId: parsedLogo.publicId,
           }
         : null,
-      images:
-        parsedImages.length > 0
-          ? parsedImages.map((img) => ({
-              url: img.url,
-              publicId: img.publicId,
-            }))
-          : [],
+      images: parsedImages.map((img) => ({
+        url: img.url,
+        publicId: img.publicId,
+      })),
     });
 
     await newMarket.save();
@@ -77,6 +77,7 @@ exports.createMarket = async (req, res) => {
 };
 
 // Update Market (Owner Only)
+
 exports.updateMarket = async (req, res) => {
   try {
     const { marketId } = req.params;
@@ -102,31 +103,29 @@ exports.updateMarket = async (req, res) => {
     const market = await Markets.findById(marketId);
     if (!market) return res.status(404).json({ error: "Market not found" });
 
-    // Ensure the owner is authorized to update the market
     if (!req.owner || market.owner.toString() !== req.owner._id.toString()) {
       return res
         .status(403)
         .json({ error: "Unauthorized to update this market" });
     }
 
-    // Parse logo and images correctly
     const parsedLogo = logo ? JSON.parse(logo) : null;
-    const parsedImages = images ? images.map((image) => JSON.parse(image)) : [];
+    let parsedImages = [];
 
-    // Handle logo update
-    market.logo = {
-      url: parsedLogo.url,
-      publicId: parsedLogo.publicId,
-    };
+    if (images) {
+      parsedImages = Array.isArray(images)
+        ? images.map((image) => JSON.parse(image))
+        : [JSON.parse(images)];
+    }
 
-    // Handle images update
-
+    market.logo = parsedLogo
+      ? { url: parsedLogo.url, publicId: parsedLogo.publicId }
+      : market.logo;
     market.images = parsedImages.map((img) => ({
       url: img.url,
       publicId: img.publicId,
     }));
 
-    // Update fields
     market.name = name || market.name;
     market.marketType = marketType || market.marketType;
     market.description = description || market.description;
@@ -135,7 +134,6 @@ exports.updateMarket = async (req, res) => {
     market.marketEmail = marketEmail || market.marketEmail;
     market.marketWebsite = marketWebsite || market.marketWebsite;
 
-    // Update location correctly
     if (location || longitude || latitude) {
       market.location = {
         address: location || market.location.address,
