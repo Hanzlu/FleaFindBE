@@ -21,8 +21,8 @@ const EventSchema = new mongoose.Schema(
     description: { type: String, required: true },
     eventType: { type: String }, // e.g., Flea Market, Special Event, etc.
     eventImage: {
-      url: { type: String, required: true },
-      publicId: { type: String, required: true },
+      url: { type: String },
+      publicId: { type: String },
     },
   },
   { timestamps: true }
